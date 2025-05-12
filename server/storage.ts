@@ -651,4 +651,231 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Create a new implementation of IStorage that uses the database
+import { db, schema } from './db';
+import { eq, and, desc, sql } from 'drizzle-orm';
+
+export class DatabaseStorage implements IStorage {
+  async getUserById(id: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(schema.users);
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const result = await db.insert(schema.users).values(userData).returning();
+    return result[0];
+  }
+
+  async updateUser(id: string, userData: Partial<User>): Promise<User> {
+    const result = await db.update(schema.users)
+      .set(userData)
+      .where(eq(schema.users.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    return result[0];
+  }
+
+  async getTransactionById(id: string): Promise<Transaction | undefined> {
+    const result = await db.select().from(schema.transactions).where(eq(schema.transactions.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllTransactions(): Promise<Transaction[]> {
+    return await db.select().from(schema.transactions).orderBy(desc(schema.transactions.timestamp));
+  }
+
+  async getTransactionsByUserId(userId: string): Promise<Transaction[]> {
+    return await db.select()
+      .from(schema.transactions)
+      .where(eq(schema.transactions.user_id, userId))
+      .orderBy(desc(schema.transactions.timestamp));
+  }
+
+  async getTransactionsByCspAgentId(cspAgentId: string): Promise<Transaction[]> {
+    return await db.select()
+      .from(schema.transactions)
+      .where(eq(schema.transactions.csp_agent_id, cspAgentId))
+      .orderBy(desc(schema.transactions.timestamp));
+  }
+
+  async createTransaction(transactionData: InsertTransaction): Promise<Transaction> {
+    const result = await db.insert(schema.transactions).values(transactionData).returning();
+    return result[0];
+  }
+
+  async getAuditById(id: string): Promise<Audit | undefined> {
+    const result = await db.select().from(schema.audits).where(eq(schema.audits.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllAudits(): Promise<Audit[]> {
+    return await db.select().from(schema.audits).orderBy(desc(schema.audits.timestamp));
+  }
+
+  async getAuditsByAuditorId(auditorId: string): Promise<Audit[]> {
+    return await db.select()
+      .from(schema.audits)
+      .where(eq(schema.audits.auditor_id, auditorId))
+      .orderBy(desc(schema.audits.timestamp));
+  }
+
+  async getAuditsByCspId(cspId: string): Promise<Audit[]> {
+    return await db.select()
+      .from(schema.audits)
+      .where(eq(schema.audits.csp_id, cspId))
+      .orderBy(desc(schema.audits.timestamp));
+  }
+
+  async createAudit(auditData: InsertAudit): Promise<Audit> {
+    const result = await db.insert(schema.audits).values(auditData).returning();
+    return result[0];
+  }
+
+  async updateAudit(id: string, auditData: Partial<Audit>): Promise<Audit> {
+    const result = await db.update(schema.audits)
+      .set(auditData)
+      .where(eq(schema.audits.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Audit with ID ${id} not found`);
+    }
+    
+    return result[0];
+  }
+
+  async getComplaintById(id: string): Promise<Complaint | undefined> {
+    const result = await db.select().from(schema.complaints).where(eq(schema.complaints.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllComplaints(): Promise<Complaint[]> {
+    return await db.select().from(schema.complaints).orderBy(desc(schema.complaints.created_at));
+  }
+
+  async getComplaintsByUserId(userId: string): Promise<Complaint[]> {
+    return await db.select()
+      .from(schema.complaints)
+      .where(eq(schema.complaints.user_id, userId))
+      .orderBy(desc(schema.complaints.created_at));
+  }
+
+  async createComplaint(complaintData: InsertComplaint): Promise<Complaint> {
+    const result = await db.insert(schema.complaints).values(complaintData).returning();
+    return result[0];
+  }
+
+  async updateComplaint(id: string, complaintData: Partial<Complaint>): Promise<Complaint> {
+    const result = await db.update(schema.complaints)
+      .set(complaintData)
+      .where(eq(schema.complaints.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Complaint with ID ${id} not found`);
+    }
+    
+    return result[0];
+  }
+
+  async getAlertById(id: string): Promise<Alert | undefined> {
+    const result = await db.select().from(schema.alerts).where(eq(schema.alerts.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllAlerts(): Promise<Alert[]> {
+    return await db.select().from(schema.alerts).orderBy(desc(schema.alerts.created_at));
+  }
+
+  async getAlertsByUserId(userId: string): Promise<Alert[]> {
+    return await db.select()
+      .from(schema.alerts)
+      .where(eq(schema.alerts.user_id, userId))
+      .orderBy(desc(schema.alerts.created_at));
+  }
+
+  async createAlert(alertData: InsertAlert): Promise<Alert> {
+    const result = await db.insert(schema.alerts).values(alertData).returning();
+    return result[0];
+  }
+
+  async markAlertAsRead(id: string): Promise<Alert> {
+    const result = await db.update(schema.alerts)
+      .set({ is_read: true })
+      .where(eq(schema.alerts.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Alert with ID ${id} not found`);
+    }
+    
+    return result[0];
+  }
+
+  async getFaceCheckById(id: string): Promise<FaceCheck | undefined> {
+    const result = await db.select().from(schema.face_checks).where(eq(schema.face_checks.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getFaceChecksByUserId(userId: string): Promise<FaceCheck[]> {
+    return await db.select()
+      .from(schema.face_checks)
+      .where(eq(schema.face_checks.user_id, userId))
+      .orderBy(desc(schema.face_checks.check_time));
+  }
+
+  async createFaceCheck(faceCheckData: InsertFaceCheck): Promise<FaceCheck> {
+    const result = await db.insert(schema.face_checks).values(faceCheckData).returning();
+    return result[0];
+  }
+
+  async getReliefClaimById(id: string): Promise<ReliefClaim | undefined> {
+    const result = await db.select().from(schema.relief_claims).where(eq(schema.relief_claims.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllReliefClaims(): Promise<ReliefClaim[]> {
+    return await db.select().from(schema.relief_claims).orderBy(desc(schema.relief_claims.filed_date));
+  }
+
+  async getReliefClaimsByCspAgentId(cspAgentId: string): Promise<ReliefClaim[]> {
+    return await db.select()
+      .from(schema.relief_claims)
+      .where(eq(schema.relief_claims.csp_agent_id, cspAgentId))
+      .orderBy(desc(schema.relief_claims.filed_date));
+  }
+
+  async createReliefClaim(reliefClaimData: InsertReliefClaim): Promise<ReliefClaim> {
+    const result = await db.insert(schema.relief_claims).values(reliefClaimData).returning();
+    return result[0];
+  }
+
+  async updateReliefClaim(id: string, reliefClaimData: Partial<ReliefClaim>): Promise<ReliefClaim> {
+    const result = await db.update(schema.relief_claims)
+      .set(reliefClaimData)
+      .where(eq(schema.relief_claims.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Relief claim with ID ${id} not found`);
+    }
+    
+    return result[0];
+  }
+}
+
+// Use the database storage instead of memory storage
+export const storage = new DatabaseStorage();
