@@ -11,44 +11,24 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  const response = await fetch('/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-    credentials: 'include'
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
   });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Login failed');
-  }
-
-  return response.json();
+  
+  if (error) throw error;
+  return data;
 };
 
 export const signOut = async () => {
-  const response = await fetch('/auth/logout', {
-    method: 'POST',
-    credentials: 'include'
-  });
-
-  if (!response.ok) {
-    throw new Error('Logout failed');
-  }
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
 };
 
 export const getCurrentUser = async () => {
-  const response = await fetch('/api/user', {
-    credentials: 'include'
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to get current user');
-  }
-
-  return response.json();
+  const { data, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  return data.user;
 };
 
 export const getUserProfile = async (userId: string) => {

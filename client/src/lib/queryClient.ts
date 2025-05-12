@@ -20,24 +20,15 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: data ? { "Content-Type": "application/json" } : {},
-      body: data ? JSON.stringify(data) : undefined,
-      credentials: "include",
-    });
+  const res = await fetch(url, {
+    method,
+    headers: data ? { "Content-Type": "application/json" } : {},
+    body: data ? JSON.stringify(data) : undefined,
+    credentials: "include",
+  });
 
-    await throwIfResNotOk(res);
-    return res;
-  } catch (error) {
-    // Handle network errors specifically
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new Error('Network error: Could not connect to the server. Please check your connection and try again.');
-    }
-    // Re-throw other errors
-    throw error;
-  }
+  await throwIfResNotOk(res);
+  return res;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -46,25 +37,16 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    try {
-      const res = await fetch(queryKey[0] as string, {
-        credentials: "include",
-      });
+    const res = await fetch(queryKey[0] as string, {
+      credentials: "include",
+    });
 
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        return null;
-      }
-
-      await throwIfResNotOk(res);
-      return await res.json();
-    } catch (error) {
-      // Handle network errors specifically
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Network error: Could not connect to the server. Please check your connection and try again.');
-      }
-      // Re-throw other errors
-      throw error;
+    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+      return null;
     }
+
+    await throwIfResNotOk(res);
+    return await res.json();
   };
 
 export const queryClient = new QueryClient({

@@ -10,11 +10,11 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 
 // Public Pages
-import PublicHomePage from "./pages/public/PublicHomePage";
-import HowItWorksPage from "./pages/public/HowItWorksPage";
-import BecomeCspPage from "./pages/public/BecomeCspPage";
-import SupportPage from "./pages/public/SupportPage";
-import CsrImpactPage from "./pages/public/CsrImpactPage";
+import PublicHomePage from "@/pages/public/HomePage";
+import HowItWorksPage from "@/pages/public/HowItWorksPage";
+import BecomeCspPage from "@/pages/public/BecomeCspPage";
+import SupportPage from "@/pages/public/SupportPage";
+import CsrImpactPage from "@/pages/public/CsrImpactPage";
 
 function Router() {
   return (
