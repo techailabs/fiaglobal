@@ -9,7 +9,8 @@ async function seed() {
     
     await db.insert(users).values([
       {
-        email: 'admin@test.com',
+        id: crypto.randomUUID(),
+        email: 'admin@fia.com',
         password: hashedPassword,
         full_name: 'Admin User',
         role: 'admin',
@@ -17,19 +18,30 @@ async function seed() {
         status: 'Active'
       },
       {
-        email: 'csp@test.com',
+        id: crypto.randomUUID(),
+        email: 'csp1@fia.com',
         password: hashedPassword,
-        full_name: 'CSP Agent',
+        full_name: 'CSP Agent 1',
         role: 'csp_agent',
         phone: '1234567891',
         status: 'Active'
       },
       {
-        email: 'customer@test.com',
+        id: crypto.randomUUID(),
+        email: 'auditor@fia.com',
         password: hashedPassword,
-        full_name: 'Customer User',
-        role: 'customer',
+        full_name: 'Auditor User',
+        role: 'auditor',
         phone: '1234567892',
+        status: 'Active'
+      },
+      {
+        id: crypto.randomUUID(),
+        email: 'officer@fia.com',
+        password: hashedPassword,
+        full_name: 'Bank Officer',
+        role: 'bank_officer',
+        phone: '1234567893',
         status: 'Active'
       }
     ]);
@@ -37,6 +49,7 @@ async function seed() {
     console.log('Sample users created successfully');
   } catch (error) {
     console.error('Error seeding database:', error);
+    throw error;
   }
 }
 
