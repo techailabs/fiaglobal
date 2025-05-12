@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase, signIn, signOut, getUserProfile } from '@/lib/supabase';
 import { useLocation } from 'wouter';
 import { User } from '@shared/schema';
+import { signIn, signOut, getCurrentUser, getUserProfile } from '@/lib/supabase';
 
 type AuthContextType = {
   user: User | null;
@@ -23,11 +23,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        
-        if (data.session) {
-          const userProfile = await getUserProfile(data.session.user.id);
-          setUser(userProfile);
+        const user = await getCurrentUser();
+        if (user) {
+          const profile = await getUserProfile(user.id);
+          setUser(profile);
         }
       } catch (err) {
         console.error('Error checking authentication:', err);
@@ -37,58 +36,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Initial check
     checkUser();
-
-    // Subscribe to auth changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const userProfile = await getUserProfile(session.user.id);
-        setUser(userProfile);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
-
-    return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
-      
-      await signIn(email, password);
-      const { data } = await supabase.auth.getSession();
-      
-      if (data.session) {
-        const userProfile = await getUserProfile(data.session.user.id);
-        setUser(userProfile);
-        
-        // Redirect based on user role
-        switch (userProfile.role) {
-          case 'admin':
-            setLocation('/admin/dashboard');
-            break;
-          case 'csp_agent':
-            setLocation('/csp/dashboard');
-            break;
-          case 'auditor':
-            setLocation('/auditor/dashboard');
-            break;
-          case 'bank_officer':
-            setLocation('/officer/dashboard');
-            break;
-          case 'customer':
-            setLocation('/customer/dashboard');
-            break;
-          default:
-            setLocation('/');
-        }
+
+      const data = await signIn(email, password);
+      const profile = await getUserProfile(data.user.id);
+      setUser(profile);
+
+      // Redirect based on user role
+      switch (profile.role) {
+        case 'admin':
+          setLocation('/admin/dashboard');
+          break;
+        case 'csp_agent':
+          setLocation('/csp/dashboard');
+          break;
+        case 'auditor':
+          setLocation('/auditor/dashboard');
+          break;
+        case 'bank_officer':
+          setLocation('/officer/dashboard');
+          break;
+        case 'customer':
+          setLocation('/customer/dashboard');
+          break;
+        default:
+          setLocation('/');
       }
     } catch (err) {
       console.error('Login error:', err);
