@@ -1,5 +1,8 @@
 import { createRoot } from "react-dom/client";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "./components/ui/toaster";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./hooks/use-auth";
+import { queryClient } from "./lib/queryClient";
 import App from "./App";
 import "./index.css";
 
@@ -18,8 +21,10 @@ if ("serviceWorker" in navigator) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <>
-    <App />
-    <Toaster />
-  </>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <App />
+      <Toaster />
+    </AuthProvider>
+  </QueryClientProvider>
 );
