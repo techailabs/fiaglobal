@@ -34,9 +34,13 @@ const LoginForm = () => {
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
+      setLoading(true);
       await login(values.email, values.password);
     } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
       console.error("Login failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 

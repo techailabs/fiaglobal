@@ -147,6 +147,10 @@ export function setupAuth(app: Express) {
   });
 
   app.post('/api/login', (req, res, next) => {
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    
     passport.authenticate('local', (err: Error | null, user: Express.User | false, info: { message?: string } | undefined) => {
       if (err) {
         return next(err);
