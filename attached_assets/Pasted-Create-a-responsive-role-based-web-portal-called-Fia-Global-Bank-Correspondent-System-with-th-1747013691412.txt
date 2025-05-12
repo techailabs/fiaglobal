@@ -1,0 +1,104 @@
+Create a responsive, role-based web portal called **Fia Global – Bank Correspondent System** with the following stack:
+
+- Frontend: React.js + Tailwind CSS
+- Backend: Node.js (Express) with Supabase PostgreSQL
+- Auth: Supabase Auth (OTP/email + role-based redirect)
+- UI Theme: Use the provided color palette and component styles
+- Include PWA compatibility for offline sync
+
+---
+
+🗂️ DATA MODELS
+
+Create Supabase tables:
+
+1. `users`:
+   - id (uuid)
+   - full_name (text)
+   - email (text, unique)
+   - role (enum: admin, csp_agent, fi_agent, auditor, bank_officer, customer)
+   - phone (text)
+   - status (text: Active, Suspended)
+   - created_at (timestamp)
+
+2. `transactions`:
+   - id
+   - user_id (fk)
+   - txn_type (AEPS, BBPS, Cash, etc.)
+   - amount
+   - status
+   - timestamp
+   - gps_lat, gps_long
+
+3. `audits`:
+   - id
+   - auditor_id
+   - csp_id
+   - photos (array of URLs)
+   - gps
+   - timestamp
+   - hash
+   - status
+
+4. `complaints`, `alerts`, `logs`, `face_checks`, `relief_claims`, etc.
+
+---
+
+📋 SEED DUMMY USERS
+
+Insert dummy users in Supabase:
+
+- Admin (admin@fia.com / role: admin)
+- 2 CSP agents (csp1@fia.com, csp2@fia.com)
+- 1 FI agent
+- 2 auditors
+- 1 bank officer
+- 3 customers
+
+Assign passwords, phone numbers, and test status tags.
+
+---
+
+🔐 LOGIN FLOW (Role-Based)
+
+- Email login via Supabase Auth
+- On login, detect role and redirect to:
+  - `/admin/dashboard`
+  - `/csp/dashboard`
+  - `/auditor/audits`
+  - `/officer/overview`
+  - `/customer/complaints`
+
+---
+
+🎨 UI DESIGN — BANK CORRESPONDENT PORTAL
+
+Color Palette:
+
+| Element              | Color Code   | Usage                                            |
+|----------------------|--------------|--------------------------------------------------|
+| Primary Purple       | #5D2E8C      | CTA buttons, headers, section backgrounds        |
+| Accent Green         | #2D9B4F      | Status tags, action highlights, success messages |
+| Base White           | #FFFFFF      | Background, card surfaces                        |
+| Neutral Gray         | #F4F4F4/D1D1D1 | Input fields, borders, table lines             |
+| Alert Red (Optional) | #FF4B4B      | Fraud alerts, critical warnings                  |
+
+Component Style Guide:
+
+- **Primary Button**: Purple background, white text, bold, rounded
+- **Secondary Button**: Green border, purple text
+- **Alerts**: Red text on white background with icon
+- **Tags/Chips**: Green = Safe, Yellow = Warn, Red = Block
+- **Modals**: White background, dark purple header, soft shadow
+
+---
+
+📦 FIX ALL ROUTES & UI
+
+- Ensure every panel (Admin, CSP, Auditor, Officer, Customer) has mock pages and test data loaded from Supabase.
+- Add session handling and logout button.
+- Use Tailwind utility classes to style all elements per color scheme.
+
+---
+
+🌐 Enable CORS, offline caching (IndexedDB), and ensure responsiveness on rural mobile devices.
