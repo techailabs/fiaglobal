@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+  --primary: 271 50% 37%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 147 55% 36%;
+  --secondary-foreground: 24 9.8% 10%;
+  --accent: 147 55% 36%;
+  --accent-foreground: 24 9.8% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --warning: 43 96% 50%;
+  --warning-foreground: 24 9.8% 10%;
+  --ring: 20 14.3% 4.1%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 271 50% 37%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 147 55% 36%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 147 55% 36%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --warning: 43 96% 50%;
+  --warning-foreground: 24 9.8% 10%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-[#F4F4F4] font-sans antialiased text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .sidebar-link {
+    @apply flex items-center py-3 px-4 my-1 mx-2 rounded-md text-gray-700 transition-all duration-200;
+  }
+
+  .sidebar-link:hover {
+    @apply bg-gray-100;
+  }
+
+  .sidebar-link.active, 
+  .sidebar-link:hover.active {
+    @apply bg-primary text-white;
+  }
+
+  .sidebar-link i {
+    @apply mr-3;
+  }
+
+  .status-badge-green {
+    @apply px-2 py-1 text-xs rounded-full bg-green-100 text-green-600;
+  }
+
+  .status-badge-yellow {
+    @apply px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-600;
+  }
+
+  .status-badge-red {
+    @apply px-2 py-1 text-xs rounded-full bg-red-100 text-red-600;
+  }
+
+  .status-badge-blue {
+    @apply px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-600;
+  }
+}
