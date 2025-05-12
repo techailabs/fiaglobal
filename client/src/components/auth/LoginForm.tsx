@@ -1,30 +1,30 @@
+
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        setLocation('/');
-      }
+      await login(email, password);
+      // Auth context will handle redirect based on user role
     } catch (error) {
       console.error('Login failed:', error);
+      alert('Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +40,7 @@ export const LoginForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div>
@@ -49,10 +50,18 @@ export const LoginForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              'Login'
+            )}
           </Button>
         </form>
       </Card>
