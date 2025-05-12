@@ -1,3 +1,4 @@
+
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
   const response = await fetch('/api/login', {
@@ -13,7 +14,9 @@ export const signIn = async (email: string, password: string) => {
     throw new Error(error.message || 'Login failed');
   }
 
-  return response.json();
+  const data = await response.json();
+  localStorage.setItem('token', data.token);
+  return data;
 };
 
 export const signOut = async () => {
@@ -60,12 +63,15 @@ export const getUserProfile = async (userId: string) => {
 
 // Database helper functions 
 export const fetchTable = async (table: string, query?: { column: string; value: any }[]) => {
+  const token = localStorage.getItem('token');
   const queryString = query 
     ? '?' + query.map(q => `${q.column}=${encodeURIComponent(q.value)}`).join('&')
     : '';
     
   const response = await fetch(`/api/${table}${queryString}`, {
-    credentials: 'include'
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   });
 
   if (!response.ok) {

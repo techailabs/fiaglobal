@@ -1,13 +1,50 @@
+
 import { Request, Response, NextFunction } from 'express';
 import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
-import { db } from './db';
-import { users } from '@shared/schema';
-import { eq } from 'drizzle-orm';
+import { Database } from "@replit/database";
 
+const db = new Database();
 const scryptAsync = promisify(scrypt);
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+
+// Add some dummy users
+async function seedUsers() {
+  const users = await db.get('users');
+  if (!users) {
+    const dummyUsers = {
+      'admin@test.com': {
+        id: '1',
+        email: 'admin@test.com',
+        password: await hashPassword('admin123'),
+        full_name: 'Admin User',
+        role: 'admin',
+        status: 'Active'
+      },
+      'csp@test.com': {
+        id: '2',
+        email: 'csp@test.com',
+        password: await hashPassword('csp123'),
+        full_name: 'CSP Agent',
+        role: 'csp_agent',
+        status: 'Active'
+      },
+      'auditor@test.com': {
+        id: '3',
+        email: 'auditor@test.com',
+        password: await hashPassword('auditor123'),
+        full_name: 'Auditor User',
+        role: 'auditor',
+        status: 'Active'
+      }
+    };
+    await db.set('users', dummyUsers);
+  }
+}
+
+// Call seed function
+seedUsers();
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString('hex');
@@ -23,38 +60,11 @@ export async function comparePasswords(supplied: string, stored: string): Promis
 }
 
 export function setupAuth(app: Express) {
-  app.post('/api/register', async (req, res) => {
-    try {
-      const { email, password, full_name, role, phone } = req.body;
-
-      const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      if (existingUser.length > 0) {
-        return res.status(400).json({ message: 'Email already in use' });
-      }
-
-      const hashedPassword = await hashPassword(password);
-      const [user] = await db.insert(users).values({
-        email,
-        password: hashedPassword,
-        full_name,
-        role,
-        phone,
-        status: 'Active'
-      }).returning();
-
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-      const { password: _, ...userWithoutPassword } = user;
-      res.status(201).json({ ...userWithoutPassword, token });
-    } catch (err) {
-      console.error('Registration error:', err);
-      res.status(500).json({ message: 'Error registering user' });
-    }
-  });
-
   app.post('/api/login', async (req, res) => {
     try {
       const { email, password } = req.body;
-      const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      const users = await db.get('users') || {};
+      const user = users[email];
 
       if (!user || !(await comparePasswords(password, user.password))) {
         return res.status(401).json({ message: 'Invalid credentials' });
@@ -77,7 +87,8 @@ export function setupAuth(app: Express) {
       }
 
       const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-      const [user] = await db.select().from(users).where(eq(users.id, decoded.userId)).limit(1);
+      const users = await db.get('users') || {};
+      const user = Object.values(users).find((u: any) => u.id === decoded.userId);
 
       if (!user) {
         return res.status(401).json({ message: "User not found" });
