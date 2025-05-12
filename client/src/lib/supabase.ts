@@ -1,74 +1,71 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase credentials. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+  const response = await fetch('/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+    credentials: 'include'
   });
-  
-  if (error) throw error;
-  return data;
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
+  }
+
+  return response.json();
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  const response = await fetch('/auth/logout', {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Logout failed');
+  }
 };
 
 export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  return data.user;
+  const response = await fetch('/api/user', {
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get current user');
+  }
+
+  return response.json();
 };
 
 export const getUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  
-  if (error) throw error;
-  return data;
-};
+  const response = await fetch(`/api/users/${userId}`, {
+    credentials: 'include'
+  });
 
-// Database helper functions for offline support
-export const syncData = async (
-  table: string,
-  localData: any[],
-  idField: string = 'id'
-) => {
-  const { data, error } = await supabase
-    .from(table)
-    .upsert(localData, { onConflict: idField });
-  
-  if (error) throw error;
-  return data;
-};
-
-export const fetchTable = async (
-  table: string,
-  query?: { column: string; value: any }[]
-) => {
-  let queryBuilder = supabase.from(table).select('*');
-  
-  if (query) {
-    query.forEach(({ column, value }) => {
-      queryBuilder = queryBuilder.eq(column, value);
-    });
+  if (!response.ok) {
+    throw new Error('Failed to get user profile');
   }
-  
-  const { data, error } = await queryBuilder;
-  if (error) throw error;
-  return data;
+
+  return response.json();
+};
+
+// Database helper functions 
+export const fetchTable = async (table: string, query?: { column: string; value: any }[]) => {
+  const queryString = query 
+    ? '?' + query.map(q => `${q.column}=${encodeURIComponent(q.value)}`).join('&')
+    : '';
+    
+  const response = await fetch(`/api/${table}${queryString}`, {
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${table}`);
+  }
+
+  return response.json();
 };
