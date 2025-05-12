@@ -46,12 +46,11 @@ export async function comparePasswords(supplied: string, stored: string): Promis
 export function setupAuth(app: Express) {
   // Create session store
   const PgSessionStore = connectPgSimple(session);
-  const pgPool = { connectionString: env.DATABASE_URL };
-
+  
   // Session configuration
   const sessionConfig: session.SessionOptions = {
     store: new PgSessionStore({
-      pool: pgPool,
+      conObject: { connectionString: env.DATABASE_URL },
       tableName: 'session',
       createTableIfMissing: true
     }),
@@ -127,7 +126,7 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
-        status: 'active',
+        status: 'Active', // Using proper enum value from schema
       });
 
       // Remove password from response
@@ -148,7 +147,7 @@ export function setupAuth(app: Express) {
   });
 
   app.post('/api/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', (err: Error | null, user: Express.User | false, info: { message?: string } | undefined) => {
       if (err) {
         return next(err);
       }
