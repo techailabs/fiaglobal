@@ -11,23 +11,25 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  const response = await fetch('/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-    credentials: 'include'
-  });
-  
-  if (!response.ok) {
-    throw new Error('Login failed');
+  try {
+    const response = await fetch('/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      throw new Error('Login failed');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw new Error('Login failed: ' + (err instanceof Error ? err.message : 'Network error'));
   }
-  
-  const data = await response.json();
-  
-  if (error) throw error;
-  return data;
 };
 
 export const signOut = async () => {
