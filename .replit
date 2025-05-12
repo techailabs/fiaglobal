@@ -47,11 +47,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run build"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "NODE_ENV=development tsx server/index.ts"
+args = "npm run build && NODE_ENV=development tsx server/index.ts"
 
 [[ports]]
 localPort = 5000
