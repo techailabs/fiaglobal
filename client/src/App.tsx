@@ -23,14 +23,14 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       
       {/* Public Routes */}
-      <Route path="/public" component={PublicHomePage} />
+      <Route path="/" component={PublicHomePage} />
       <Route path="/how-it-works" component={HowItWorksPage} />
       <Route path="/become-csp" component={BecomeCspPage} />
       <Route path="/support" component={SupportPage} />
       <Route path="/csr-impact" component={CsrImpactPage} />
 
       {/* Protected Routes */}
-      <ProtectedRoute path="/" component={HomePage} />
+      <ProtectedRoute path="/dashboard" component={HomePage} />
       
       {/* Admin Routes - These will be implemented as we build them */}
       <ProtectedRoute path="/admin/users" component={HomePage} requiredRoles={["admin"]} />
