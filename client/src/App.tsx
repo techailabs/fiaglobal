@@ -8,6 +8,13 @@ import Login from "@/pages/Login";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import { AuthProvider } from "@/hooks/useAuth";
 
+// Public Pages
+import HomePage from "@/pages/public/HomePage";
+import HowItWorksPage from "@/pages/public/HowItWorksPage";
+import BecomeCspPage from "@/pages/public/BecomeCspPage";
+import SupportPage from "@/pages/public/SupportPage";
+import CsrImpactPage from "@/pages/public/CsrImpactPage";
+
 // Admin Routes
 import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminUserManagement from "@/pages/admin/UserManagement";
@@ -32,7 +39,11 @@ function Router() {
   return (
     <Switch>
       {/* Public Routes */}
-      <Route path="/" component={Login} />
+      <Route path="/" component={HomePage} />
+      <Route path="/how-it-works" component={HowItWorksPage} />
+      <Route path="/become-csp" component={BecomeCspPage} />
+      <Route path="/support" component={SupportPage} />
+      <Route path="/csr-impact" component={CsrImpactPage} />
       <Route path="/login" component={Login} />
 
       {/* Admin Routes */}
