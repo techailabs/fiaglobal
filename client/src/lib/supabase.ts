@@ -1,42 +1,35 @@
-
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include'
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed');
-    }
-
-    return data;
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Network error occurred');
-  }
-};
-
-export const signOut = async () => {
-  const response = await fetch('/auth/logout', {
+  const response = await fetch('/api/login', {
     method: 'POST',
-    credentials: 'include'
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password })
   });
 
   if (!response.ok) {
-    throw new Error('Logout failed');
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
+
+  return response.json();
+};
+
+export const signOut = async () => {
+  localStorage.removeItem('token');
 };
 
 export const getCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found');
+  }
+
   const response = await fetch('/api/user', {
-    credentials: 'include'
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   });
 
   if (!response.ok) {
@@ -47,8 +40,15 @@ export const getCurrentUser = async () => {
 };
 
 export const getUserProfile = async (userId: string) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found');
+  }
+
   const response = await fetch(`/api/users/${userId}`, {
-    credentials: 'include'
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
   });
 
   if (!response.ok) {
