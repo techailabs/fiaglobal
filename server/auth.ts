@@ -110,7 +110,7 @@ export function setupAuth(app: Express) {
   });
 
   // Authentication routes
-  app.post('/api/register', async (req, res) => {
+  app.post('/auth/register', async (req, res) => {
     try {
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(req.body.email);
@@ -146,7 +146,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post('/api/login', (req, res, next) => {
+  app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local', (err: Error | null, user: Express.User | false, info: { message?: string } | undefined) => {
       if (err) {
         return next(err);
