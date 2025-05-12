@@ -11,36 +11,44 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  try {
-    const response = await fetch('/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include'
-    });
-    
-    if (!response.ok) {
-      throw new Error('Login failed');
-    }
-    
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    throw new Error('Login failed: ' + (err instanceof Error ? err.message : 'Network error'));
+  const response = await fetch('/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
+
+  return response.json();
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  const response = await fetch('/auth/logout', {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Logout failed');
+  }
 };
 
 export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  return data.user;
+  const response = await fetch('/api/user', {
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get current user');
+  }
+
+  return response.json();
 };
 
 export const getUserProfile = async (userId: string) => {

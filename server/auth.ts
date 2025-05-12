@@ -169,7 +169,7 @@ export function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.post('/api/logout', (req, res) => {
+  app.post('/auth/logout', (req, res) => {
     req.logout((err) => {
       if (err) {
         return res.status(500).json({ message: 'Error logging out' });
