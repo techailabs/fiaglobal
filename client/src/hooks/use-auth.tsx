@@ -5,7 +5,7 @@ import {
   UseMutationResult,
 } from "@tanstack/react-query";
 import { User, InsertUser } from "@shared/schema";
-import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
+import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 type AuthContextType = {
@@ -17,21 +17,16 @@ type AuthContextType = {
   registerMutation: UseMutationResult<User, Error, InsertUser>;
 };
 
-type LoginData = {
-  username: string;
-  password: string;
-};
+type LoginData = Pick<InsertUser, "email" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  
   const {
     data: user,
     error,
     isLoading,
-  } = useQuery<User | null, Error>({
+  } = useQuery<User | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
@@ -46,13 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.full_name}!`,
-        variant: "default",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Login failed",
-        description: error.message || "Invalid credentials",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -68,13 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({
         title: "Registration successful",
         description: `Welcome to Fia Global Bank, ${user.full_name}!`,
-        variant: "default",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Registration failed",
-        description: error.message || "Could not create account",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -88,8 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
       toast({
         title: "Logged out",
-        description: "You have been successfully logged out",
-        variant: "default",
+        description: "You have been successfully logged out.",
       });
     },
     onError: (error: Error) => {
@@ -104,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user: user || null,
+        user: user ?? null,
         isLoading,
         error,
         loginMutation,

@@ -27,13 +27,13 @@ export default function HomePage() {
             <DashboardCard 
               title="Audit Logs"
               description="View system audit logs and activity"
-              icon={<FileBar className="h-12 w-12 text-primary" />}
+              icon={<FileText className="h-12 w-12 text-primary" />}
               link="/admin/audits"
             />
             <DashboardCard 
               title="System Settings"
               description="Configure system parameters"
-              icon={<FileClock className="h-12 w-12 text-primary" />}
+              icon={<Settings className="h-12 w-12 text-primary" />}
               link="/admin/settings"
             />
           </>
@@ -56,7 +56,7 @@ export default function HomePage() {
             <DashboardCard 
               title="Reports"
               description="Generate and view transaction reports"
-              icon={<FileBar className="h-12 w-12 text-primary" />}
+              icon={<FileText className="h-12 w-12 text-primary" />}
               link="/csp/reports"
             />
           </>
@@ -73,7 +73,7 @@ export default function HomePage() {
             <DashboardCard 
               title="Completed Audits"
               description="Review previously completed audits"
-              icon={<FileBar className="h-12 w-12 text-primary" />}
+              icon={<FileText className="h-12 w-12 text-primary" />}
               link="/auditor/completed"
             />
             <DashboardCard 
@@ -96,7 +96,7 @@ export default function HomePage() {
             <DashboardCard 
               title="Reports"
               description="Generate and view transaction reports"
-              icon={<FileBar className="h-12 w-12 text-primary" />}
+              icon={<FileText className="h-12 w-12 text-primary" />}
               link="/officer/reports"
             />
             <DashboardCard 
@@ -126,7 +126,7 @@ export default function HomePage() {
             <DashboardCard 
               title="Support"
               description="Get help and support"
-              icon={<FileBar className="h-12 w-12 text-primary" />}
+              icon={<FileText className="h-12 w-12 text-primary" />}
               link="/customer/support"
             />
           </>
