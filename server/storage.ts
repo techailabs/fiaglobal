@@ -652,7 +652,8 @@ export class MemStorage implements IStorage {
 }
 
 // Create a new implementation of IStorage that uses the database
-import { db, schema } from './db';
+import { db } from './db';
+import * as schema from '@shared/schema';
 import { eq, and, desc, sql } from 'drizzle-orm';
 
 export class DatabaseStorage implements IStorage {

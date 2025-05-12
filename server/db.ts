@@ -3,11 +3,8 @@ import postgres from 'postgres';
 import * as schema from '@shared/schema';
 import { env } from './env';
 
-// Database client
+// Create postgres client
 const client = postgres(env.DATABASE_URL);
 
-// Create the Drizzle ORM instance
+// Create drizzle client with schema
 export const db = drizzle(client, { schema });
-
-// Export for use in storage and other files
-export { schema };

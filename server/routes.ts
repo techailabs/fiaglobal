@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import { setupAuth } from "./auth";
 import { 
   insertUserSchema, 
   insertTransactionSchema, 
@@ -13,6 +14,9 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
+  
   // API routes - all routes under /api
   const apiRouter = express.Router();
   app.use('/api', apiRouter);

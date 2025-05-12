@@ -1,22 +1,17 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import { randomBytes } from 'crypto';
 
-// Runtime environment variables
+// Load environment variables from .env file
+dotenv.config();
+
+// Generate a random session secret if not provided
+const sessionSecret = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
+
 export const env = {
-  // Database connection
-  DATABASE_URL: process.env.DATABASE_URL || '',
-  
-  // Auth settings
-  SESSION_SECRET: process.env.SESSION_SECRET || 'fia-global-secret-key',
-  
-  // Server settings
-  PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || 'development',
+  PORT: process.env.PORT || 5000,
+  DATABASE_URL: process.env.DATABASE_URL,
+  SESSION_SECRET: sessionSecret,
+  SUPABASE_URL: process.env.VITE_SUPABASE_URL,
+  SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY
 };
-
-// Validate required environment variables
-const requiredEnvVars = ['DATABASE_URL'];
-const missingEnvVars = requiredEnvVars.filter(v => !env[v as keyof typeof env]);
-
-if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
-}
